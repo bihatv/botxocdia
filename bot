@@ -258,7 +258,7 @@ def handle_invite_friends(message):
     caption = """
 <b>❗️ NHẬN GIFCODE RẤT ĐƠN GIẢN CHỈ CẦN VÀI THAO TÁC
 ✅ MỜI BẠN BÈ THAM GIA BOT NHẬN NGAY 2000đ 
-✅ http://sum34.club/ LÀ TÊN MIỀN CHÍNH HÃNG DUY NHẤT!</b>
+✅ https://Xocdia88.am/ LÀ TÊN MIỀN CHÍNH HÃNG DUY NHẤT!</b>
 
 👤 Link Mời Bạn Bè ( Bấm vào coppy ) :<code> {invite_link}</code>
     """.format(invite_link=invite_link)
