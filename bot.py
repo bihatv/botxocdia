@@ -261,7 +261,7 @@ def handle_invite_friends(message):
     user_id = message.from_user.id
     invite_link = f"https://t.me/{bot.get_me().username}?start={user_id}"
 
-    photo_url = "https://images.app.goo.gl/5RvXiiCXPf9R52eh6"
+    photo_url = "https://images.app.goo.gl/Ejj1CcpVhqbRBsz28"
     caption = """
 <b>❗️ NHẬN GIFCODE RẤT ĐƠN GIẢN CHỈ CẦN VÀI THAO TÁC
 ✅ MỜI BẠN BÈ THAM GIA BOT NHẬN NGAY 1000đ 
