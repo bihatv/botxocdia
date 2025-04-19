@@ -10,11 +10,15 @@ from io import BytesIO  # Thư viện hỗ trợ làm việc với dữ liệu n
 
 # Bot information and required channels
 # Bot information and required channels
-API_TOKEN ='7740820960:AAEDo3R1SUPSu8GQJih0aXcCL_yExzFOwVs'  # Updated token
+API_TOKEN ='7584993027:AAGm1y0ms1odeE-nlsOYGQdWWFv8iOyCMLc'  # Updated token
 bot = telebot.TeleBot(API_TOKEN)
-NHOM_CANTHAMGIA = ['@hupcodenhacai1','@cheoreflink','@kiemtienfree21','@LOCFRE24H']
+settings = {
+    "groups": ['@hupcodenhacai1'],
+    "min_withdraw": 20000,
+    "referral_bonus": 4000
+}
+
 user_data, invited_users, captcha_codes = {}, {}, {}
-min_withdraw_amount = 5000  # Minimum withdrawal amount
 admins = [7014048216]  # Admin IDs
 from PIL import Image, ImageDraw, ImageFont
 import random
@@ -64,7 +68,8 @@ def handle_start(message):
             save_data(user_data_file, user_data)
 
     markup = types.InlineKeyboardMarkup()
-    for channel in NHOM_CANTHAMGIA:
+    for channel in settings["groups"]:
+
         markup.add(types.InlineKeyboardButton(f'👉 Tham Gia Nhóm 👈', url=f'https://t.me/{channel[1:]}'))
     
     # Generate a CAPTCHA image and solution
@@ -113,15 +118,16 @@ def handle_captcha_response(message):
 
             markup = types.ReplyKeyboardMarkup(row_width=2, resize_keyboard=True)
             markup.add(types.KeyboardButton('👤 Tài Khoản'), types.KeyboardButton('👥 Mời Bạn Bè'))
-            markup.add(types.KeyboardButton('💵 Đổi Code'), types.KeyboardButton('📊 Thống Kê'))
+            markup.add(types.KeyboardButton('💵 Rút tiền'), types.KeyboardButton('📊 Thống Kê'))
             markup.add(types.KeyboardButton('🆘 Hỗ Trợ'))
 
             balance = get_balance(user_id)
             bot.send_message(message.chat.id, f"🫡 Chào Mừng Bạn Quay Trở Lại! Số Dư Của Bạn Là {balance} đồng. Tiếp Tục Mời Bạn Bè Kiếm Code Ngay Nào", reply_markup=markup)
 
             if referrer_id and referrer_id in user_data:
-                update_user_balance(referrer_id, 2000)
-                bot.send_message(referrer_id, f"Bạn đã nhận được 2000 đồng khi mời {message.from_user.username} tham gia.")
+                update_user_balance(referrer_id, settings["referral_bonus"])
+                bot.send_message(referrer_id, f"Bạn đã nhận được {settings['referral_bonus']} đồng khi mời {message.from_user.username} tham gia.")
+
                 invited_users.pop(str(user_id))
                 save_data(invited_users_file, invited_users)
         else:
@@ -134,7 +140,7 @@ invited_users_file = 'invitedusers.json'
 
 # Check channel subscription
 def check_subscription(user_id):
-    for channel in NHOM_CANTHAMGIA:
+    for channel in settings["groups"]:
         try:
             member = bot.get_chat_member(channel, user_id)
             if member.status not in ['member', 'administrator', 'creator']:
@@ -197,8 +203,9 @@ def handle_start(message):
 
             # Thưởng cho người mời
             if referrer_id in user_data:
-                update_user_balance(referrer_id, 2000 )  # Thưởng cho người mời
-                bot.send_message(referrer_id, f"🎉 Bạn đã nhận được 2000 đồng khi mời {message.from_user.username} tham gia.")
+                update_user_balance(referrer_id, settings["referral_bonus"])
+                bot.send_message(referrer_id, f"🎉 Bạn đã nhận được {settings['referral_bonus']} đồng khi mời {message.from_user.username} tham gia.")
+
 
         # Xóa thông tin người mời sau khi thưởng
         if str(user_id) in invited_users:
@@ -206,7 +213,7 @@ def handle_start(message):
             save_data(invited_users_file, invited_users)
 
     markup = types.InlineKeyboardMarkup()
-    for channel in NHOM_CANTHAMGIA:
+    for channel in settings["groups"]:
         markup.add(types.InlineKeyboardButton(f'👉 Tham Gia Nhóm 👈', url=f'https://t.me/{channel[1:]}'))
     markup.add(types.InlineKeyboardButton('✔️Kiểm Tra✔️', callback_data='check'))
     photo_url = "https://i.imgur.com/wmsTcUg.jpeg"
@@ -235,15 +242,15 @@ def check_channels(call):
 
         markup = types.ReplyKeyboardMarkup(row_width=2, resize_keyboard=True)
         markup.add(types.KeyboardButton('👤 Tài Khoản'), types.KeyboardButton('👥 Mời Bạn Bè'))
-        markup.add(types.KeyboardButton('💵 Đổi Code'), types.KeyboardButton('Link Game'))
+        markup.add(types.KeyboardButton('💵 Rút tiền'), types.KeyboardButton('Link Game'))
         markup.add(types.KeyboardButton('📊 Thống Kê'))  # Thêm nút "Thống Kê"
 
         balance = get_balance(user_id)
         bot.send_message(call.message.chat.id, f"🫡 Chào Mừng Bạn Quay Trở Lại! Số Dư Của Bạn Là {balance} đồng. Tiếp Tục Mời Bạn Bè Kiếm Code Ngay Nào", reply_markup=markup)
 
         if referrer_id and referrer_id in user_data:
-            update_user_balance(referrer_id, 2000)  # Thưởng cho người mời
-            bot.send_message(referrer_id, f"Bạn đã nhận được 2000 đồng khi mời {call.from_user.username} tham gia.")
+            update_user_balance(referrer_id, settings["referral_bonus"])
+            bot.send_message(referrer_id, f"Bạn đã nhận được {settings['referral_bonus']} đồng khi mời {call.from_user.username} tham gia.")
             invited_users.pop(str(user_id))
             save_data(invited_users_file, invited_users)
     else:
@@ -254,11 +261,11 @@ def handle_invite_friends(message):
     user_id = message.from_user.id
     invite_link = f"https://t.me/{bot.get_me().username}?start={user_id}"
 
-    photo_url = "https://images.app.goo.gl/yLodXpQFQZ1dFckL9"
+    photo_url = "https://images.app.goo.gl/5RvXiiCXPf9R52eh6"
     caption = """
 <b>❗️ NHẬN GIFCODE RẤT ĐƠN GIẢN CHỈ CẦN VÀI THAO TÁC
-✅ MỜI BẠN BÈ THAM GIA BOT NHẬN NGAY 2000đ 
-✅ https://Xocdia88.am/ LÀ TÊN MIỀN CHÍNH HÃNG DUY NHẤT!</b>
+✅ MỜI BẠN BÈ THAM GIA BOT NHẬN NGAY 1000đ 
+✅https://momo.vn// LÀ TÊN MIỀN CHÍNH HÃNG DUY NHẤT!</b>
 
 👤 Link Mời Bạn Bè ( Bấm vào coppy ) :<code> {invite_link}</code>
     """.format(invite_link=invite_link)
@@ -354,20 +361,25 @@ ID Của Bạn: {user_id}
     
     bot.send_message(message.chat.id, text, parse_mode='Markdown')
 
-@bot.message_handler(func=lambda message: message.text == '💵 Đổi Code')
+@bot.message_handler(func=lambda message: message.text == '💵 Rút tiền')
 def handle_withdraw(message):
     user_id = message.from_user.id
-    if str(user_id) in user_data and user_data[str(user_id)]['balance'] >= min_withdraw_amount:
-        withdraw_instructions = """
-✅ Số Tiền Rút Tối Thiểu 5K
-👉 Làm Theo Các Lệnh Sau Đây Để Rút Tiền
+    if str(user_id) in user_data and user_data[str(user_id)]['balance'] >= settings["min_withdraw"]:
+        withdraw_instructions = f"""
+🏦 Hướng dẫn rút tiền:
+✅ Số tiền rút tối thiểu: {settings["min_withdraw"]} VND
+💬 Cú pháp:
+/ruttien [nganhang/momo] [stk/sđt] [sotien]
 
-▶/doicode [ ID TELE ] [ SỐ TIỀN ] 
-VD : /doicode 7214228954 5000
-        """
+📌 Ví dụ:
+/ruttien vietcombank 0123456789 20000
+/ruttien momo 0912345678 50000
+
+Ngân hàng hỗ trợ: Vietcombank, ACB, VPBank, MBBank, TPBank, BIDV, Techcombank, Agribank, MoMo
+"""
         bot.send_message(message.chat.id, withdraw_instructions)
     else:
-        bot.send_message(message.chat.id, "⚠️ Bạn cần có số dư ít nhất 5.000 đồng để thực hiện lệnh rút tiền.")
+        bot.send_message(message.chat.id, "⚠️ Bạn cần có số dư ít nhất 20.000 đồng để thực hiện lệnh rút tiền.")
 
 # Tải danh sách mã đổi thưởng từ file
 def load_redeemable_codes(filename):
@@ -387,57 +399,66 @@ def save_redeemable_codes(filename, codes):
 redeemable_codes_file = 'redeemable_codes.txt'
 
 # Hàm xử lý lệnh /doicode với chức năng duyệt tự động
-@bot.message_handler(commands=['doicode'])
+@bot.message_handler(commands=['ruttien'])
 def handle_withdraw_request(message):
     user_id = message.from_user.id
-    if str(user_id) in user_data:
-        current_balance = user_data[str(user_id)]['balance']
-        details = message.text.split()
-        
-        # Kiểm tra cú pháp lệnh
-        if len(details) == 3:
-            bank_name = details[1]
-            try:
-                amount = int(details[2])
-            except ValueError:
-                bot.send_message(message.chat.id, "🚫 Số tiền phải là một số nguyên hợp lệ.")
-                return
 
-            # Kiểm tra điều kiện số dư tối thiểu
-            if amount >= min_withdraw_amount:
-                if current_balance >= amount:
-                    # Tải mã đổi thưởng có sẵn
-                    redeemable_codes = load_redeemable_codes(redeemable_codes_file)
-                    
-                    if redeemable_codes:
-                        # Trừ số dư
-                        user_data[str(user_id)]['balance'] -= amount
-                        save_data(user_data_file, user_data)
+    if str(user_id) not in user_data:
+        bot.send_message(message.chat.id, "🔒 Bạn chưa có tài khoản hoặc chưa đủ điều kiện rút tiền.")
+        return
 
-                        # Cấp mã cho người dùng và xóa khỏi danh sách
-                        code = redeemable_codes.pop(0)
-                        save_redeemable_codes(redeemable_codes_file, redeemable_codes)
+    current_balance = user_data[str(user_id)]['balance']
+    parts = message.text.split()
 
-                        # Gửi mã cho người dùng
-                        bot.send_message(message.chat.id, f"🎉 Bạn đã nhận được mã code: {code}\n"
-                                                          f"Số tiền {amount} đồng đã được trừ khỏi tài khoản của bạn.")
-                    
-                        # Thông báo cho admin về giao dịch
-                        for admin_id in admins:
-                            bot.send_message(admin_id, f"🛡 Yêu cầu rút mã tự động cho user @{message.from_user.username} (ID: {user_id}):"
-                                                       f"\n- Ngân hàng: {bank_name}"
-                                                       f"\n- Số tiền: {amount} đồng"
-                                                       f"\n- Mã code: {code}")
-                    else:
-                        bot.send_message(message.chat.id, "⛔️ Hiện tại không có mã code nào khả dụng. Vui lòng thử lại sau.")
-                else:
-                    bot.send_message(message.chat.id, "⛔️ Số dư của bạn không đủ để thực hiện giao dịch.")
-            else:
-                bot.send_message(message.chat.id, "⚠️ Số tiền rút tối thiểu là 5.000 VND.")
-        else:
-            bot.send_message(message.chat.id, "🚫 Sai cú pháp. Vui lòng nhập theo mẫu: /doicode [uid game] [số tiền]")
-    else:
-        bot.send_message(message.chat.id, "🔒 Bạn cần có số dư ít nhất 5.000 VND và đã đăng ký để thực hiện lệnh rút tiền.")
+    if len(parts) != 4:
+        bot.send_message(message.chat.id, "⚠️ Sai cú pháp!\nDùng đúng mẫu:\n/ruttien [nganhang] [sotaikhoan] [sotien]\nVí dụ: /ruttien vietcombank 0123456789 20000")
+        return
+
+    bank_name = parts[1].lower()
+    account_number = parts[2]
+    try:
+        amount = int(parts[3])
+    except ValueError:
+        bot.send_message(message.chat.id, "🚫 Số tiền phải là số nguyên hợp lệ.")
+        return
+
+    valid_banks = ['vietcombank', 'acb', 'vpbank', 'mbbank', 'tpbank', 'bidv', 'techcombank', 'agribank', 'momo']
+
+    if bank_name not in valid_banks:
+        bot.send_message(message.chat.id, f"🏦 Ngân hàng không hợp lệ.\nChỉ hỗ trợ: {', '.join(valid_banks)}")
+        return
+
+    if amount < settings["min_withdraw"]:
+        bot.send_message(message.chat.id, f"⚠️ Số tiền rút tối thiểu là {settings['min_withdraw']} VND.")
+        return
+
+    if current_balance < amount:
+        bot.send_message(message.chat.id, "❌ Số dư của bạn không đủ để thực hiện rút tiền.")
+        return
+
+    # Trừ tiền
+    user_data[str(user_id)]['balance'] -= amount
+    save_data(user_data_file, user_data)
+
+    # Gửi xác nhận cho người dùng
+    # Gửi xác nhận cho người dùng
+bot.send_message(message.chat.id, f"🎉 Yêu cầu rút {amount} VND đã được ghi nhận.\nVui lòng đợi admin duyệt giao dịch.")
+
+# Gửi thông báo cho admin kèm nút duyệt/hủy
+for admin_id in admins:
+    markup = types.InlineKeyboardMarkup()
+    markup.add(
+        types.InlineKeyboardButton("✅ Duyệt", callback_data=f"approve_{user_id}_{amount}"),
+        types.InlineKeyboardButton("❌ Hủy", callback_data=f"decline_{user_id}_{amount}")
+    )
+
+    loai_tai_khoan = "📱 Ví MoMo" if bank_name == "momo" else f"💳 Ngân hàng: {bank_name.upper()}"
+    bot.send_message(
+        admin_id,
+        f"📤 YÊU CẦU RÚT TIỀN MỚI\n👤 User: @{message.from_user.username or user_id}\n{loai_tai_khoan}\n🔢 SĐT/STK: {account_number}\n💰 Số tiền: {amount} VND",
+        reply_markup=markup
+    )
+
 
 
 @bot.callback_query_handler(func=lambda call: call.data.startswith(('approve_', 'decline_')))
@@ -445,7 +466,8 @@ def handle_approval(call):
     try:
         action, user_id, amount = call.data.split('_')
         if action == "approve":
-            bot.send_message(user_id, f"🎉 Yêu cầu rút tiền của bạn đã được duyệt thành công với số tiền {amount} đồng ✅.")
+            bot.send_message(user_id, f"🎉 Yêu cầu rút {amount} VND đã được admin duyệt.\n💰 Tiền sẽ được chuyển trong thời gian sớm nhất.")
+
             bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id, text="✅ Đã duyệt yêu cầu rút tiền.")
         elif action == "decline":
             bot.send_message(user_id, "❌ Yêu cầu rút tiền của bạn đã bị hủy. Vui lòng liên hệ admin để biết thêm chi tiết.")
@@ -476,7 +498,7 @@ def handle_statistics(message):
 
 @bot.message_handler(func=lambda message: message.text == '🆘 Hỗ Trợ')
 def handle_support(message):
-    bot.send_message(message.chat.id, "🆘 Bạn cần hỗ trợ? Vui lòng liên hệ với chúng tôi qua Telegram: @nguyendanh8386 Và Đợi Phản Hồi.")
+    bot.send_message(message.chat.id, "🆘 Bạn cần hỗ trợ? Vui lòng liên hệ với chúng tôi qua Telegram: @congthinh29 Và Đợi Phản Hồi.")
 
 @bot.message_handler(commands=['chatmem'])
 def handle_chatmem_command(message):
@@ -531,6 +553,100 @@ def reset_user_command(message):
             bot.reply_to(message, f"ℹ️ Không tìm thấy dữ liệu user {target_id}.")
     except Exception as e:
         bot.reply_to(message, f"⚠️ Lỗi: {str(e)}")
+#chỉnh min rút và nhóm
+@bot.message_handler(commands=['setgroup'])
+def set_group_command(message):
+    if message.from_user.id not in admins:
+        return bot.reply_to(message, "❌ Bạn không có quyền thực hiện.")
+
+    parts = message.text.split()
+    if len(parts) < 2:
+        return bot.reply_to(message, "📌 Dùng đúng cú pháp: /setgroup @tennhom")
+
+    new_group = parts[1]
+    settings["groups"] = [new_group]
+    bot.reply_to(message, f"✅ Đã cập nhật nhóm yêu cầu tham gia thành: {new_group}")
+
+@bot.message_handler(commands=['setminwithdraw'])
+def set_min_withdraw(message):
+    if message.from_user.id not in admins:
+        return bot.reply_to(message, "❌ Bạn không có quyền thực hiện.")
+
+    parts = message.text.split()
+    if len(parts) != 2 or not parts[1].isdigit():
+        return bot.reply_to(message, "📌 Dùng đúng cú pháp: /setminwithdraw [số tiền]")
+
+    settings["min_withdraw"] = int(parts[1])
+    bot.reply_to(message, f"✅ Số tiền rút tối thiểu mới: {parts[1]} đồng")
+
+@bot.message_handler(commands=['setreferral'])
+def set_referral_bonus(message):
+    if message.from_user.id not in admins:
+        return bot.reply_to(message, "❌ Bạn không có quyền thực hiện.")
+
+    parts = message.text.split()
+    if len(parts) != 2 or not parts[1].isdigit():
+        return bot.reply_to(message, "📌 Dùng đúng cú pháp: /setreferral [số tiền]")
+
+    settings["referral_bonus"] = int(parts[1])
+    bot.reply_to(message, f"✅ Tiền thưởng mỗi lời mời mới: {parts[1]} đồng")
+
+
+#thêm group
+@bot.message_handler(commands=['addgroup'])
+def add_group_command(message):
+    if message.from_user.id not in admins:
+        return bot.reply_to(message, "❌ Bạn không có quyền thực hiện.")
+
+    parts = message.text.split()
+    if len(parts) < 2:
+        return bot.reply_to(message, "📌 Dùng đúng cú pháp: /addgroup @tennhom")
+
+    new_group = parts[1]
+    if new_group not in settings["groups"]:
+        settings["groups"].append(new_group)
+        bot.reply_to(message, f"✅ Đã thêm nhóm mới: {new_group}")
+    else:
+        bot.reply_to(message, "ℹ️ Nhóm đã tồn tại trong danh sách.")
+#xoá group
+@bot.message_handler(commands=['removegroup'])
+def remove_group_command(message):
+    if message.from_user.id not in admins:
+        return bot.reply_to(message, "❌ Bạn không có quyền thực hiện.")
+
+    parts = message.text.split()
+    if len(parts) < 2:
+        return bot.reply_to(message, "📌 Dùng đúng cú pháp: /removegroup @tennhom")
+
+    group_to_remove = parts[1]
+    if group_to_remove in settings["groups"]:
+        settings["groups"].remove(group_to_remove)
+        bot.reply_to(message, f"✅ Đã xoá nhóm: {group_to_remove}")
+    else:
+        bot.reply_to(message, "⚠️ Không tìm thấy nhóm trong danh sách.")
+#check quản trị viên của bot
+@bot.message_handler(commands=['checkbotingroup'])
+def check_bot_in_group(message):
+    if message.from_user.id not in admins:
+        return bot.reply_to(message, "❌ Bạn không có quyền thực hiện.")
+
+    results = []
+    for group in settings["groups"]:
+        try:
+            bot_member = bot.get_chat_member(group, bot.get_me().id)
+            status = bot_member.status  # 'administrator', 'member', 'left', etc.
+
+            if status == 'administrator':
+                results.append(f"✅ {group}: Bot là quản trị viên.")
+            elif status == 'member':
+                results.append(f"⚠️ {group}: Bot chỉ là thành viên, không có quyền quản trị.")
+            else:
+                results.append(f"❌ {group}: Bot chưa được thêm vào nhóm.")
+        except Exception as e:
+            results.append(f"❌ {group}: Lỗi - {str(e)}")
+
+    reply = "\n".join(results)
+    bot.reply_to(message, reply)
 
 #cuối
 from flask import Flask, request, abort
