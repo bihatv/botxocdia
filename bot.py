@@ -265,7 +265,7 @@ def handle_invite_friends(message):
     caption = """
 <b>❗️ NHẬN GIFCODE RẤT ĐƠN GIẢN CHỈ CẦN VÀI THAO TÁC
 ✅ MỜI BẠN BÈ THAM GIA BOT NHẬN NGAY 1000đ 
-✅https://momo.vn// LÀ TÊN MIỀN CHÍNH HÃNG DUY NHẤT!</b>
+✅ https://momo.vn// LÀ TÊN MIỀN CHÍNH HÃNG DUY NHẤT!</b>
 
 👤 Link Mời Bạn Bè ( Bấm vào coppy ) :<code> {invite_link}</code>
     """.format(invite_link=invite_link)
@@ -437,27 +437,27 @@ def handle_withdraw_request(message):
         return
 
     # Trừ tiền
+       # Trừ tiền
     user_data[str(user_id)]['balance'] -= amount
     save_data(user_data_file, user_data)
 
     # Gửi xác nhận cho người dùng
-    # Gửi xác nhận cho người dùng
-bot.send_message(message.chat.id, f"🎉 Yêu cầu rút {amount} VND đã được ghi nhận.\nVui lòng đợi admin duyệt giao dịch.")
+    bot.send_message(message.chat.id, f"🎉 Yêu cầu rút {amount} VND đã được ghi nhận.\nVui lòng đợi admin duyệt giao dịch.")
 
-# Gửi thông báo cho admin kèm nút duyệt/hủy
-for admin_id in admins:
-    markup = types.InlineKeyboardMarkup()
-    markup.add(
-        types.InlineKeyboardButton("✅ Duyệt", callback_data=f"approve_{user_id}_{amount}"),
-        types.InlineKeyboardButton("❌ Hủy", callback_data=f"decline_{user_id}_{amount}")
-    )
+    # Gửi thông báo cho admin kèm nút duyệt/hủy
+    for admin_id in admins:
+        markup = types.InlineKeyboardMarkup()
+        markup.add(
+            types.InlineKeyboardButton("✅ Duyệt", callback_data=f"approve_{user_id}_{amount}"),
+            types.InlineKeyboardButton("❌ Hủy", callback_data=f"decline_{user_id}_{amount}")
+        )
 
-    loai_tai_khoan = "📱 Ví MoMo" if bank_name == "momo" else f"💳 Ngân hàng: {bank_name.upper()}"
-    bot.send_message(
-        admin_id,
-        f"📤 YÊU CẦU RÚT TIỀN MỚI\n👤 User: @{message.from_user.username or user_id}\n{loai_tai_khoan}\n🔢 SĐT/STK: {account_number}\n💰 Số tiền: {amount} VND",
-        reply_markup=markup
-    )
+        loai_tai_khoan = "📱 Ví MoMo" if bank_name == "momo" else f"💳 Ngân hàng: {bank_name.upper()}"
+        bot.send_message(
+            admin_id,
+            f"📤 YÊU CẦU RÚT TIỀN MỚI\n👤 User: @{message.from_user.username or user_id}\n{loai_tai_khoan}\n🔢 SĐT/STK: {account_number}\n💰 Số tiền: {amount} VND",
+            reply_markup=markup
+        )
 
 
 
